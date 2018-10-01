@@ -1,4 +1,4 @@
-module.exports = class QuickFind {
+module.exports = class QuickUnion {
   constructor(N) {
     this.id = [];
 
