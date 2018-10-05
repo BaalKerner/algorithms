@@ -7,10 +7,12 @@
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
-    private WeightedQuickUnionUF wqu;
+    private WeightedQuickUnionUF wquUp;
+    private WeightedQuickUnionUF wquDown;
     private boolean[] openSites;
     private int numOfOpenSites;
     private int N;
+    private boolean percolates;
 
     public Percolation(int n) {
         if (n <= 0) {
@@ -19,8 +21,9 @@ public class Percolation {
 
         N = n;
         numOfOpenSites = 0;
-        wqu = new WeightedQuickUnionUF(N * N + 2);
-        openSites = new boolean[N * N + 2];
+        wquUp = new WeightedQuickUnionUF(N * N + 1);
+        wquDown = new WeightedQuickUnionUF(N * N + 1);
+        openSites = new boolean[N * N + 1];
     }
 
     public void open(int row, int col) {
@@ -36,23 +39,31 @@ public class Percolation {
         numOfOpenSites++;
 
         if (row == 1) {
-            wqu.union(index, 0);
+            wquUp.union(index, 0);
         } else {
-            connect(row - 1, col, index);
+            connect(row - 1, col, index, wquUp);
+            connect(row - 1, col, index, wquDown);
         }
 
         if (row == N) {
-            wqu.union(index, N * N + 1);
+            wquDown.union(index, 0);
         } else {
-            connect(row + 1, col, index);
+            connect(row + 1, col, index, wquUp);
+            connect(row + 1, col, index, wquDown);
         }
 
         if (col > 1) {
-            connect(row, col - 1, index);
+            connect(row, col - 1, index, wquUp);
+            connect(row, col - 1, index, wquDown);
         }
 
         if (col < N) {
-            connect(row, col + 1, index);
+            connect(row, col + 1, index, wquUp);
+            connect(row, col + 1, index, wquDown);
+        }
+
+        if (wquUp.connected(0, index) && wquDown.connected(0, index)) {
+            percolates = true;
         }
     }
 
@@ -71,7 +82,7 @@ public class Percolation {
 
         int index = xyTo1d(row, col);
 
-        return wqu.connected(index, 0);
+        return wquUp.connected(index, 0);
     }
 
     public int numberOfOpenSites() {
@@ -79,14 +90,14 @@ public class Percolation {
     }
 
     public boolean percolates() {
-        return wqu.connected(0, N * N + 1);
+        return percolates;
     }
 
     public static void main(String[] args) {
 
     }
 
-    private void connect(int row, int col, int index) {
+    private void connect(int row, int col, int index, WeightedQuickUnionUF wqu) {
         if (isOpen(row , col)) {
             int indexUp = xyTo1d(row , col);
 
