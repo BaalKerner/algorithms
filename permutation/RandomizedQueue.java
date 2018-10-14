@@ -52,12 +52,12 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             while (queue[lastIndex] == null) {
                 --lastIndex;
             }
+
+            if (size == capacity / 4) {
+                resize(capacity / 2);
+            }
         } else {
             lastIndex = -1;
-        }
-
-        if (size == capacity / 4) {
-            resize(capacity / 2);
         }
 
         return item;
@@ -82,7 +82,11 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     public static void main(String[] args) {
+        RandomizedQueue<Integer> rq = new RandomizedQueue<>();
 
+        rq.enqueue(438);
+        rq.dequeue();
+        rq.enqueue(67);
     }
 
     private void resize(int newCapacity)
